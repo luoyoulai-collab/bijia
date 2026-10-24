@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e7c66">
+<title>装修比价侠 · 87㎡/20万</title>
+<style>
+:root{
+  --bg:#f4f6f5; --card:#ffffff; --ink:#1b2420; --sub:#77807b; --line:#e9ede9;
+  --brand:#0e7c66; --brand-2:#0a5c4c; --brand-bg:#e7f3ef;
+  --ok:#178a4c; --ok-bg:#e9f7ee; --warn:#c77414; --warn-bg:#fdf3e5; --bad:#d4380d; --bad-bg:#fdeceb;
+  --hard:#2563eb; --equip:#0e7c66; --kitchen:#e0642a; --soft:#8b5cf6;
+  --radius:16px; --shadow:0 1px 2px rgba(20,40,30,.05),0 6px 20px rgba(20,40,30,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;
+  padding-bottom:calc(88px + env(safe-area-inset-bottom));
+  touch-action:manipulation;
+}
+header{
+  position:sticky;top:0;z-index:50;background:rgba(244,246,245,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+header .h-title{font-size:17px;font-weight:800;letter-spacing:.3px}
+header .h-title .xia{color:var(--brand)}
+header .h-sub{font-size:11px;color:var(--sub);font-weight:500}
+.h-budget{
+  background:var(--brand-bg);color:var(--brand-2);font-weight:800;font-size:13px;
+  padding:6px 12px;border-radius:99px;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+main{padding:14px 14px 8px;max-width:640px;margin:0 auto}
+main .page{display:none;animation:fadeIn .18s ease}
+main .page.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.card h3{font-size:15px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.card h3 .tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;color:#fff}
+.muted{color:var(--sub);font-size:12.5px}
+.small{font-size:12px}
+
+/* ===== 顶部分类色 ===== */
+.g-hard{background:var(--hard)}.g-equip{background:var(--equip)}.g-kitchen{background:var(--kitchen)}.g-soft{background:var(--soft)}
+
+/* ===== tabbar ===== */
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+}
+nav button{
+  flex:1;border:0;background:none;font-size:10.5px;color:var(--sub);font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0 3px;border-radius:12px;font-family:inherit;
+}
+nav button .ico{font-size:21px;line-height:1.15;filter:grayscale(1);opacity:.55;transition:.15s}
+nav button.on{color:var(--brand)}
+nav button.on .ico{filter:none;opacity:1;transform:scale(1.08)}
+nav .nav-add{color:var(--brand)}
+nav .nav-add .ico{
+  filter:none;opacity:1;background:var(--brand);color:#fff;width:46px;height:30px;border-radius:99px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;font-family:system-ui;
+  box-shadow:0 4px 12px rgba(14,124,102,.35);
+}
+
+/* ===== 预算页 ===== */
+.hero{background:linear-gradient(135deg,#0e7c66,#0a5c4c 60%,#073f34);color:#fff;border-radius:20px;padding:18px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.hero .row1{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.hero label{font-size:12px;opacity:.85}
+.hero .big{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.5px;display:flex;align-items:baseline;gap:6px}
+.hero input{
+  width:170px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);color:#fff;
+  font-size:28px;font-weight:800;font-family:inherit;border-radius:10px;padding:2px 10px;outline:none;
+  font-variant-numeric:tabular-nums;
+}
+.hero .unit{font-size:14px;font-weight:700;opacity:.8}
+.hero .left{text-align:right}
+.hero .left .num{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.hero .left .num.neg{color:#ffb4a2}
+.hero .stats{display:flex;gap:8px;margin-top:14px}
+.hero .stat{flex:1;background:rgba(255,255,255,.12);border-radius:12px;padding:8px 6px;text-align:center}
+.hero .stat b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
+.hero .stat span{font-size:10.5px;opacity:.8}
+
+.grp-card{border:1px solid var(--line)}
+.grp-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.grp-head .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
+.grp-head .t{flex:1}
+.grp-head .t b{font-size:14.5px}
+.grp-head .t .small{display:block}
+.grp-head .money{font-weight:800;font-variant-numeric:tabular-nums;font-size:15px;text-align:right}
+.grp-head .money .small{display:block;font-weight:500}
+.bar{height:7px;background:#eef1ee;border-radius:99px;overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--brand);transition:width .3s}
+.bar i.over{background:var(--bad)}
+
+.cat-mini{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px dashed var(--line);font-size:13.5px}
+.cat-mini:first-of-type{border-top:0}
+.cat-mini .ic{font-size:17px;width:24px;text-align:center}
+.cat-mini .nm{flex:1;color:var(--ink)}
+.cat-mini .nm .small{display:block;color:var(--sub)}
+.cat-mini .pr{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.cat-mini .pr .none{color:#c2c8c4;font-weight:500}
+
+.tips-card{background:linear-gradient(135deg,#fffaf0,#fff5e6);border:1px solid #f5e2c4}
+.tips-card h3{color:#8a5a12}
+.step-card{background:var(--brand-bg);border:1px solid #cfe9e0;padding:14px 16px}
+.step-card b{color:var(--brand-2)}
+.step-btn{
+  display:block;width:100%;border:0;background:var(--brand);color:#fff;font-size:14.5px;font-weight:700;
+  padding:11px;border-radius:12px;margin-top:10px;font-family:inherit;
+}
+
+/* ===== 比价页 ===== */
+.grp-title{display:flex;align-items:center;gap:7px;margin:16px 4px 8px;font-size:14px;font-weight:800}
+.grp-title .dot{width:8px;height:8px;border-radius:99px}
+.grp-title .cnt{font-size:11px;color:var(--sub);font-weight:600;margin-left:auto}
+.cat-card{
+  background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:9px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;transition:transform .12s;
+}
+.cat-card:active{transform:scale(.985)}
+.cat-card .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.cat-card .mid{flex:1;min-width:0}
+.cat-card .nm{font-size:14.5px;font-weight:700}
+.cat-card .ref{font-size:11.5px;color:var(--sub)}
+.cat-card .ref b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.cat-card .right{text-align:right;flex-shrink:0}
+.cat-card .best{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.cat-card .best.good{color:var(--ok)}
+.cat-card .best.none{color:#c8cdc9;font-size:12px;font-weight:600}
+.cat-card .sub-r{font-size:10.5px;color:var(--sub);display:block}
+.cat-card .chev{color:#c8cdc9;font-size:18px;flex-shrink:0}
+.pill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--bad-bg);color:var(--bad)}
+.empty{text-align:center;padding:36px 20px;color:var(--sub)}
+.empty .e-ico{font-size:42px;margin-bottom:8px}
+.empty button{margin-top:12px;border:0;background:var(--brand);color:#fff;font-weight:700;padding:10px 26px;border-radius:99px;font-size:14px;font-family:inherit}
+
+/* ===== 记一笔 ===== */
+textarea,.ipt{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:16px;font-family:inherit;
+  background:#fff;color:var(--ink);outline:none;transition:border .15s;
+}
+textarea{min-height:110px;resize:vertical;line-height:1.6}
+textarea:focus,.ipt:focus{border-color:var(--brand)}
+.ipt-num{font-variant-numeric:tabular-nums;font-weight:700;font-size:18px}
+label.f-lb{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:14px 0 6px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;font-family:inherit;cursor:pointer;
+  font-size:14.5px;font-weight:700;padding:11px 18px;border-radius:12px;background:var(--brand);color:#fff;transition:.15s;
+}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--brand-bg);color:var(--brand-2)}
+.btn.blk{width:100%}
+.btn.big{padding:13px;font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{
+  border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-size:14.5px;font-weight:700;
+  font-variant-numeric:tabular-nums;font-family:inherit;color:var(--ink);
+}
+.chip .c-tag{font-size:10px;font-weight:700;margin-left:5px;padding:1px 6px;border-radius:99px;background:#eef1ee;color:var(--sub)}
+.chip.on{border-color:var(--brand);background:var(--brand-bg);color:var(--brand-2)}
+.chip.on .c-tag{background:var(--brand);color:#fff}
+.chip:active{transform:scale(.95)}
+.catpick .pg{font-size:11px;font-weight:800;margin:10px 0 5px;letter-spacing:.5px}
+
+/* ===== 验收 ===== */
+.ck-item{border-top:1px dashed var(--line);padding:11px 0;display:flex;gap:10px;align-items:flex-start}
+.ck-item:first-of-type{border-top:0}
+.ck-item .txt{flex:1;font-size:13.8px}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;flex-shrink:0}
+.seg button{
+  border:0;background:#fff;padding:5px 9px;font-size:11.5px;font-weight:700;color:var(--sub);font-family:inherit;
+}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button.ok{background:var(--ok);color:#fff}
+.seg button.bad{background:var(--bad);color:#fff}
+.ck-sum{font-size:12.5px;color:var(--sub);margin-top:8px}
+.ck-sum b.bad{color:var(--bad)}
+
+/* ===== more ===== */
+.row-btn{display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px dashed var(--line);width:100%;border-left:0;border-right:0;border-bottom:0;background:none;font-family:inherit;cursor:pointer;text-align:left}
+.row-btn:first-of-type{border-top:0}
+.row-btn .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--brand-bg);flex-shrink:0}
+.row-btn .t{flex:1}
+.row-btn .t b{font-size:14.5px;display:block}
+.row-btn .t span{font-size:11.5px;color:var(--sub)}
+.row-btn .arr{color:#c8cdc9;font-size:17px}
+.about p{font-size:13px;color:#444d48;margin-bottom:8px}
+.about b{color:var(--brand-2)}
+
+/* ===== sheet ===== */
+.mask{position:fixed;inset:0;background:rgba(12,20,16,.45);z-index:80;opacity:0;pointer-events:none;transition:.22s}
+.mask.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--bg);
+  border-radius:22px 22px 0 0;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transform:translateY(105%);transition:transform .26s cubic-bezier(.32,.72,.28,1);
+  padding:8px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.sheet.on{transform:none}
+.sheet .grab{width:40px;height:4.5px;background:#d5dad6;border-radius:99px;margin:4px auto 12px}
+.sh-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+.sh-head .ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
+.sh-head .t{flex:1;min-width:0}
+.sh-head .t b{font-size:17px}
+.sh-head .t .small{display:block}
+.sh-close{border:0;background:#eef1ee;color:var(--sub);width:32px;height:32px;border-radius:99px;font-size:15px;flex-shrink:0}
+
+/* 参考价条 */
+.refbox{background:var(--card);border-radius:14px;padding:13px 14px 9px;margin:10px 0 12px;box-shadow:var(--shadow)}
+.refscale{position:relative;height:34px;margin:4px 6px 2px}
+.refscale .track{position:absolute;left:0;right:0;top:14px;height:6px;background:#eef1ee;border-radius:99px}
+.refscale .fill{position:absolute;top:14px;height:6px;background:linear-gradient(90deg,#9fc9bd,#0e7c66);border-radius:99px}
+.refscale .mid-tick{position:absolute;top:9px;width:2px;height:16px;background:#0a5c4c;border-radius:2px}
+.refscale .q-dot{
+  position:absolute;top:9.5px;width:13px;height:13px;border-radius:99px;background:#fff;border:3px solid var(--warn);
+  transform:translateX(-50%);box-shadow:0 1px 4px rgba(0,0,0,.18);
+}
+.refscale .q-dot.pick{border-color:var(--ok)}
+.refscale .lb{position:absolute;top:-14px;transform:translateX(-50%);font-size:10px;color:var(--sub);white-space:nowrap}
+.refscale .lb.b{top:26px}
+.ref-legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--sub);margin-top:4px;padding:0 2px}
+
+.q-row{
+  background:var(--card);border-radius:13px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;
+  border:2px solid transparent;box-shadow:var(--shadow);
+}
+.q-row.pick{border-color:var(--ok);background:var(--ok-bg)}
+.q-row .mid{flex:1;min-width:0}
+.q-row .nm{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-row .nt{font-size:11.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.q-row .pr{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;flex-shrink:0}
+.q-row .ops{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.q-act{
+  border:1.5px solid var(--line);background:#fff;border-radius:99px;font-size:11px;font-weight:700;
+  padding:4px 11px;font-family:inherit;color:var(--sub);
+}
+.q-act.use{background:var(--ok);border-color:var(--ok);color:#fff}
+.q-act.del{color:var(--bad);border-color:#f3c9bd}
+.tipbox{background:var(--warn-bg);border:1px solid #f0dcb8;border-radius:12px;padding:11px 13px;font-size:12.8px;color:#7a5410;margin-top:12px}
+.tipbox b{display:block;margin-bottom:3px}
+
+.toast{
+  position:fixed;left:50%;bottom:calc(108px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:rgba(20,30,25,.92);color:#fff;font-size:13.5px;font-weight:600;padding:10px 20px;border-radius:99px;
+  z-index:120;opacity:0;pointer-events:none;transition:.25s;max-width:86vw;text-align:center;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#shareTxt{min-height:260px;font-size:12.5px;line-height:1.7;font-family:ui-monospace,Menlo,monospace}
+.warn-line{background:var(--bad-bg);color:var(--bad);font-size:12px;font-weight:700;border-radius:9px;padding:6px 10px;margin-top:8px}
+.ok-line{background:var(--ok-bg);color:var(--ok);font-size:12px;font-weight:700;border-radius:9px;padding:6px 10px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="h-title">装修<span class="xia">比价侠</span></div>
+    <div class="h-sub">87㎡ · 湘潭 · 20万精装</div>
+  </div>
+  <div class="h-budget" id="hBudget">剩余 ¥0</div>
+</header>
+
+<main>
+  <section class="page" id="pg-budget"></section>
+  <section class="page" id="pg-compare"></section>
+  <section class="page" id="pg-add"></section>
+  <section class="page" id="pg-check"></section>
+  <section class="page" id="pg-more"></section>
+</main>
+
+<nav id="tabbar"></nav>
+
+<div class="mask" id="mask"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+
+<input type="file" id="fileImp" accept=".json,application/json" style="display:none">
+
+<script>
+/* ================= 数据 ================= */
+const GROUPS=[
+  {id:'hard',  name:'硬装施工', ico:'🧰', color:'#2563eb', cls:'g-hard'},
+  {id:'equip', name:'大件设备', ico:'⚙️', color:'#0e7c66', cls:'g-equip'},
+  {id:'kitchen',name:'厨卫系统',ico:'🚿', color:'#e0642a', cls:'g-kitchen'},
+  {id:'soft',  name:'软装家电（预留）', ico:'🛋️', color:'#8b5cf6', cls:'g-soft'},
+];
+const CATS=[
+  {id:'shuidian', g:'hard', ico:'⚡', name:'水电改造',   ref:[8000,13000], pct:6,   tip:'空置2年的毛坯：进场先做水管打压+摇表测电，合格管线可局部改造，别急着全拆。全改参考100–150元/㎡（按建筑面积）。合同一定写清“水电超支封顶价”，这是最容易超的增项。'},
+  {id:'fangshui', g:'hard', ico:'💧', name:'防水工程',   ref:[1200,2500],  pct:1.5, tip:'厨房+卫生间+阳台。卫生间墙面淋浴区刷到1.8米。做完必须闭水试验48小时，到楼下邻居家确认无渗漏再贴砖。'},
+  {id:'cizhuan',  g:'hard', ico:'🧱', name:'瓷砖及铺贴', ref:[8000,15000], pct:8,   tip:'客餐厅800×800釉面砖30–60元/片是主流；贴砖人工三四线35–55元/㎡。问清报价含不含辅料（水泥沙子/背胶/美缝），很多低价单靠这个加钱。'},
+  {id:'diban',    g:'hard', ico:'🪵', name:'卧室木地板', ref:[6000,10000], pct:5,   tip:'三间卧室约35㎡，强化地板80–150元/㎡（含安装），多层实木150–300。地暖房选专用地暖地板，认准环保ENF/E0级。'},
+  {id:'qiangmian',g:'hard', ico:'🎨', name:'墙面乳胶漆', ref:[6000,9500],  pct:5,   tip:'含腻子找平+人工。立邦/多乐士中端系列足够；一面墙打磨三遍是手艺活，别在这省。警惕“墙面找平另算”，先问清房子平整度。'},
+  {id:'diaoding', g:'hard', ico:'✨', name:'吊顶石膏线', ref:[2500,5000],  pct:2.5, tip:'厨卫铝扣板吊顶+客餐厅双眼皮/边吊。装中央空调和地暖的楼层注意：梁下走管后吊顶会压层高，提前和空调、地暖商家对图纸。'},
+  {id:'shineimen',g:'hard', ico:'🚪', name:'室内门',     ref:[4500,9000],  pct:4.5, tip:'3樘卧室复合免漆门1200–1800元/樘 + 厨卫铝合金门。门套、五金、安装费要一次问全，“门”本身常只是报价的一半。'},
+  {id:'dingzhigui',g:'hard',ico:'🗄️', name:'定制柜体',   ref:[14000,20000],pct:9,   tip:'玄关柜+两个卧室衣柜。颗粒板按投影面积800–1200元/㎡。抽屉、铰链、见光板都可能是增项，让商家出“一价全含”清单。'},
+  {id:'dengju',   g:'hard', ico:'💡', name:'灯具开关面板',ref:[2500,5000], pct:2,   tip:'面板（公牛/西门子）和灯具网购比实体便宜一半，让电工安装即可。开关插座点位在水电阶段就要定好。'},
+  {id:'kongtiao', g:'equip',ico:'❄️', name:'中央空调',   ref:[21000,36000],pct:14,  tip:'87㎡小三房一拖四（5匹）国产（美的/格力/海尔）2.5–3.6万，含安装。⚠️省钱打法：客厅风管机+卧室挂机只要1.2–1.8万，省1万+。签合同确认：辅材（铜管/冷凝管）是否全含、超出怎么算。'},
+  {id:'dinuan',   g:'equip',ico:'🔥', name:'水地暖',     ref:[15000,22000],pct:9,   tip:'含壁挂炉+分集水器+约55–60㎡实铺+回填。87㎡用24KW炉子即可，炉子可兼顾生活热水（省一台热水器，但大水量不如零冷水稳）。层高吃5–7cm。电地暖0.8–1.5万是备选。⚠️若选水地暖+零冷水热水器，两者热水功能重叠，钱花一遍就够。'},
+  {id:'reshuiqi', g:'equip',ico:'♨️', name:'燃气热水器', ref:[2000,3500],  pct:1.5, tip:'16L零冷水主流2000–2700元（美的/海尔/万和）。⚠️先确认气源：管道天然气选T型、瓶装液化气选Y型，机型不通用！湘潭市区小区一般是管道天然气，先问物业。'},
+  {id:'chugui',   g:'kitchen',ico:'🍽️',name:'整体橱柜', ref:[6000,12000], pct:5,   tip:'约4延米，石英石台面。电商定制999–2500元/延米，本地店多砍价。台下盆工艺+阻尼铰链是加分项。水槽下方记得留插座（小厨宝/净水器）。'},
+  {id:'chudian',  g:'kitchen',ico:'🍳',name:'厨电三件', ref:[3500,7500],  pct:3,   tip:'烟机+灶具套装2000–4000元国产够用，水槽+龙头600–1200。烟灶找燃气具活动套餐，别单买。'},
+  {id:'linyufang',g:'kitchen',ico:'🚿',name:'淋浴房',   ref:[1200,3500],  pct:1.5, tip:'一字型定制800–3000元/㎡，钢化玻璃必须带3C标志+防爆膜，五金看不锈钢。卫生间小选弧扇形/钻石型省空间。挡水条要在贴砖前预埋！'},
+  {id:'weiyu',    g:'kitchen',ico:'🛁',name:'卫浴洁具', ref:[3500,7500],  pct:2.5, tip:'马桶（虹吸式1000–2000）+恒温花洒（800–1500）+浴室柜（1000–2000）。网购大促价通常比建材城低30%，型号在实体店看好、网上下单是常规操作。'},
+  {id:'ruanzhuang',g:'soft', ico:'🛋️',name:'软装家电', ref:[35000,45000],pct:20,  tip:'沙发+床床垫+餐桌+窗帘+冰箱洗衣机电视等。硬装设备定完再买，电商大促（618/双11）蹲一波能省几千。'},
+];
+const CHECK=[
+  {g:'水管',ico:'💧',items:[
+    '水管打压测试：0.8MPa 保压30分钟不掉压（要求施工方当场做，拍照录像留证）',
+    '所有下水口倒水试验：排水通畅、存水弯完好、无返味',
+    '冷热水管复核（左热右冷），水表走字正常',
+  ]},
+  {g:'电路',ico:'⚡',items:[
+    '摇表测原线路绝缘电阻：合格的可保留局部改造，省下大几千',
+    '配电箱空开/漏电保护动作测试，逐路标记用途',
+    '原线径确认：照明≥1.5平方、普通插座≥2.5平方、空调专线≥4平方',
+    '向物业索要水电竣工图，没有就全屋拍照存档',
+  ]},
+  {g:'结构门窗',ico:'🏠',items:[
+    '空鼓锤全屋敲检：单处空鼓大于400cm²要求物业整改',
+    '卫生间+阳台闭水试验48小时，到楼下确认无渗漏',
+    '墙顶面裂缝、渗水痕迹排查（重点窗边、墙角、外墙内侧）',
+    '门窗启闭顺滑、密封条完好、玻璃有3C标志',
+  ]},
+  {g:'收尾事项',ico:'📋',items:[
+    '燃气表及管道完好，确认气源类型：管道天然气(T) / 瓶装液化气(Y)——热水器机型要对应',
+    '下沉式卫生间回填前拍照留底',
+    '量房核对实际套内面积与层高（地暖约吃5–7cm层高，门洞高度要预留）',
+    '中央空调+地暖+吊顶三方一起对图纸，确定管线走向再开工',
+  ]},
+];
+
+/* ================= 状态 ================= */
+const KEY='bijia_x_v1';
+const defaultS=()=>({budget:200000,quotes:{},picked:{},check:{},createdAt:Date.now()});
+let S=defaultS();
+try{const raw=localStorage.getItem(KEY);if(raw){const p=JSON.parse(raw);S=Object.assign(defaultS(),p);}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ================= 工具 ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Math.round(n).toLocaleString('zh-CN');
+const fmtW=n=>{const v=n/10000;return (v>=10?v.toFixed(1):v.toFixed(2)).replace(/\.?0+$/,'')+'万';};
+const fmtShort=n=>n>=10000?fmtW(n):(n/1000).toFixed(1).replace(/\.0$/,'')+'千';
+const target=c=>Math.round(S.budget*c.pct/100/100)*100;
+const catById=id=>CATS.find(c=>c.id===id);
+const grpById=id=>GROUPS.find(g=>g.id===id);
+const quotesOf=id=>(S.quotes[id]||[]);
+const minQuote=id=>{const q=quotesOf(id);return q.length?q.reduce((a,b)=>a.price<=b.price?a:b):null;};
+const pickedQuote=id=>{const pid=S.picked[id];return pid?(quotesOf(id).find(x=>x.id===pid)||null):null;};
+const priceOf=id=>{const p=pickedQuote(id);if(p)return p.price;const m=minQuote(id);return m?m.price:null;};
+const sumBy=fn=>CATS.reduce((acc,c)=>{const v=fn(c);return v==null?acc:acc+v;},0);
+const sumPicked=()=>sumBy(c=>pickedQuote(c.id)?pickedQuote(c.id).price:null);
+const sumMin=()=>sumBy(c=>{const m=minQuote(c.id);return m?m.price:null;});
+const sumTarget=g=>CATS.filter(c=>c.g===g).reduce((a,c)=>a+target(c),0);
+const sumGot=g=>CATS.filter(c=>c.g===g).reduce((a,c)=>{const v=priceOf(c.id);return v==null?a:a+v;},0);
+let toastTimer=null;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),2200);}
+
+/* ================= 价格识别 ================= */
+function extractPrices(t){
+  const out=[],seen=new Set();
+  const push=(v,conf,src)=>{
+    const k=Math.round(v)+'|'+conf;
+    if(v<1||v>99999999||seen.has(k))return;seen.add(k);
+    out.push({val:Math.round(v*100)/100,conf,src});
+  };
+  let m;
+  const r1=/[¥￥＄]\s*([0-9][0-9,，]*(?:\.[0-9]+)?)\s*(万)?/g;
+  while(m=r1.exec(t)){let v=parseFloat(m[1].replace(/[，,]/g,''));if(m[2])v*=10000;push(v,'hi',m[0]);}
+  const r2=/([0-9][0-9,，]*(?:\.[0-9]+)?)\s*(万元|万|元|块钱|块)/g;
+  while(m=r2.exec(t)){let v=parseFloat(m[1].replace(/[，,]/g,''));if(m[2].indexOf('万')>=0)v*=10000;push(v,'hi',m[0]);}
+  const years=new Set();
+  const r3=/(^|[^0-9.%])((?:19|20)[0-9]{2})(?![0-9.%])/g;
+  while(m=r3.exec(t))years.add(m[2]);
+  const r4=/(^|[^0-9.,，])([0-9]{3,8}(?:\.[0-9]{1,2})?)(?![0-9.%])/g;
+  while(m=r4.exec(t)){
+    const v=parseFloat(m[2]);if(v<100)continue;
+    if(years.has(m[2])&&v>=1900&&v<=2099)continue;
+    push(v,'lo',m[2]);
+  }
+  out.sort((a,b)=>(b.conf==='hi')-(a.conf==='hi')||a.val-b.val);
+  return out.slice(0,14);
+}
+
+/* ================= tabbar ================= */
+let curTab='budget';
+const TABS=[
+  {id:'budget',ico:'🏠',lb:'预算'},
+  {id:'compare',ico:'⚖️',lb:'比价'},
+  {id:'add',ico:'＋',lb:'记一笔',add:true},
+  {id:'check',ico:'✅',lb:'验收'},
+  {id:'more',ico:'⋯',lb:'更多'},
+];
+function renderTabbar(){
+  $('#tabbar').innerHTML=TABS.map(t=>t.add
+    ?`<button class="nav-add" data-tab="add"><span class="ico">＋</span><span>记一笔</span></button>`
+    :`<button class="${curTab===t.id?'on':''}" data-tab="${t.id}"><span class="ico">${t.ico}</span><span>${t.lb}</span></button>`
+  ).join('');
+}
+function switchTab(id){
+  curTab=id;renderTabbar();
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='pg-'+id));
+  renderPage(id);
+  window.scrollTo({top:0});
+}
+function renderPage(id){
+  if(id==='budget')renderBudget();
+  if(id==='compare')renderCompare();
+  if(id==='add')renderAdd();
+  if(id==='check')renderCheck();
+  if(id==='more')renderMore();
+  updateHeader();
+}
+function updateHeader(){
+  const left=S.budget-sumMin();
+  const el=$('#hBudget');
+  el.textContent=(left>=0?'剩余 ':'超支 ')+fmt(Math.abs(left));
+  el.style.background=left>=0?'var(--brand-bg)':'var(--bad-bg)';
+  el.style.color=left>=0?'var(--brand-2)':'var(--bad)';
+}
+
+/* ================= 预算页 ================= */
+function renderBudget(){
+  const mins=sumMin(),left=S.budget-mins;
+  const done=CATS.filter(c=>pickedQuote(c.id)).length;
+  const withQ=CATS.filter(c=>quotesOf(c.id).length).length;
+  let h='';
+  if(withQ===0){
+    h+=`<div class="card step-card">
+      <b>三步用起来</b>
+      <div class="small" style="margin-top:6px;line-height:1.9">
+        1️⃣ 下面确认总预算<br>2️⃣ 点「＋记一笔」，把看到的任何报价粘贴进去<br>3️⃣ 这里自动算你还剩多少钱
+      </div>
+      <button class="step-btn" data-act="goadd">去记第一笔报价 →</button>
+    </div>`;
+  }
+  h+=`<div class="hero">
+    <div class="row1">
+      <div>
+        <label>总预算（元）</label>
+        <div class="big"><input type="number" inputmode="numeric" id="budgetIpt" value="${S.budget}"><span class="unit">元</span></div>
+      </div>
+      <div class="left">
+        <label class="small">还剩</label>
+        <div class="num ${left<0?'neg':''}">${left<0?'-':''}¥${fmt(Math.abs(left))}</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>${withQ}</b><span>已录价品类</span></div>
+      <div class="stat"><b>${done}</b><span>已选定商家</span></div>
+      <div class="stat"><b>¥${fmtW(mins)}</b><span>按最低价合计</span></div>
+    </div>
+    ${left<0?`<div style="background:rgba(255,120,90,.25);border-radius:10px;padding:8px 12px;margin-top:12px;font-size:12.5px;font-weight:700">⚠️ 按目前最低报价已超预算 ${fmt(mins-S.budget)} 元</div>`:''}
+  </div>`;
+
+  GROUPS.forEach(g=>{
+    const tg=sumTarget(g.id),got=sumGot(g.id);
+    const over=tg>0&&got>tg;
+    h+=`<div class="card grp-card">
+      <div class="grp-head">
+        <div class="ic" style="background:${g.color}">${g.ico}</div>
+        <div class="t"><b>${g.name}</b><span class="small muted">${CATS.filter(c=>c.g===g.id).length} 个品类</span></div>
+        <div class="money" ${over?'style="color:var(--bad)"':''}>
+          ${got?fmtW(got):'—'}<span class="small muted">目标 ${fmtW(tg)}</span>
+        </div>
+      </div>
+      <div class="bar"><i class="${over?'over':''}" style="width:${tg?Math.min(100,got/tg*100):0}%"></i></div>
+      <div class="small muted">按最低/已选价统计${got?`：¥${fmt(got)}`:'，还没有报价'}</div>
+    `;
+    CATS.filter(c=>c.g===g.id).forEach(c=>{
+      const q=pickedQuote(c.id),mn=minQuote(c.id),p=q?q.price:(mn?mn.price:null);
+      const tgt=target(c);
+      const st=q?`✓ ${esc(q.name)}`:(mn?`最低 ${esc(mn.name)}`:'未录报价');
+      const dev=p!=null?`<span class="small" style="color:${p>tgt?'var(--bad)':'var(--ok)'}">${p>tgt?'超'+fmt(p-tgt):'省'+fmt(tgt-p)}</span>`:'';
+      h+=`<div class="cat-mini" data-act="opencat" data-id="${c.id}">
+        <div class="ic">${c.ico}</div>
+        <div class="nm">${c.name}<span class="small">目标 ¥${fmt(tgt)}</span></div>
+        <div class="pr">${p!=null?`¥${fmt(p)}<span class="small" style="display:block">${st} ${dev}</span>`:`<span class="none">待报价 →</span>`}</div>
+      </div>`;
+    });
+    h+=`</div>`;
+  });
+
+  h+=`<div class="card tips-card">
+    <h3>📌 87㎡ · 20万 参考打法<span class="tag g-equip" style="margin-left:auto">含空调+地暖</span></h3>
+    <div class="small" style="line-height:1.95">
+      · 硬装施工 <b>≈8.7万</b>（三四线全包行情800–1300元/㎡）<br>
+      · 大件设备 <b>≈4.9万</b>（一拖四空调2.5–3.6万＋水地暖1.5–2.2万＋热水器）<br>
+      · 厨卫系统 <b>≈2.4万</b>（橱柜厨电+淋浴房+洁具）<br>
+      · 软装家电 <b>留4万</b><br>
+      <span style="color:#a0700f">💰 想省：空调改「客厅风管机+卧室挂机」省1万+；水地暖壁挂炉能兼生活热水，和零冷水热水器二选一。</span><br>
+      <span style="color:#a0700f">⚠️ 空置2年毛坯：开工前先做水电验收（点「验收」页），合格管线局部改造即可，别全拆白花钱。</span>
+    </div>
+  </div>
+  <div class="card about">
+    <h3>🛡️ 防坑四条</h3>
+    <p>· <b>水电按实结算</b>是最大增项，合同写封顶价</p>
+    <p>· 报价单不含的：搬运费、垃圾清运、成品保护、美缝，问一句省一截</p>
+    <p>· 中央空调辅材（铜管/支架）超出部分单价先谈好</p>
+    <p>· 定金别交超30%，分期按进度付款</p>
+  </div>`;
+  $('#pg-budget').innerHTML=h;
+  const bi=$('#budgetIpt');
+  bi.addEventListener('change',()=>{
+    let v=parseInt(bi.value,10);if(isNaN(v)||v<10000)v=10000;if(v>5000000)v=5000000;
+    S.budget=v;save();renderPage('budget');
+  });
+}
+
+/* ================= 比价页 ================= */
+function renderCompare(){
+  let h='';
+  const withQ=CATS.filter(c=>quotesOf(c.id).length).length;
+  if(withQ===0){
+    h=`<div class="empty">
+      <div class="e-ico">⚖️</div>
+      <b>还没有任何报价</b>
+      <div class="small" style="margin-top:6px">从京东/淘宝/建材城看到的价，粘贴进来就能比</div>
+      <button data-act="goadd">＋ 记第一笔</button>
+    </div>`;
+  }
+  GROUPS.forEach(g=>{
+    const cats=CATS.filter(c=>c.g===g.id);
+    const cnt=cats.reduce((a,c)=>a+quotesOf(c.id).length,0);
+    h+=`<div class="grp-title"><span class="dot" style="background:${g.color}"></span>${g.name}<span class="cnt">${cnt?cnt+' 条报价':'待记录'}</span></div>`;
+    cats.forEach(c=>{
+      const mn=minQuote(c.id),q=pickedQuote(c.id),p=q?q.price:(mn?mn.price:null);
+      const tgt=target(c);
+      let status='';
+      if(p!=null){
+        if(p<c.ref[0]*0.8)status=`<span class="pill warn">明显偏低</span>`;
+        else if(p>c.ref[1]*1.15)status=`<span class="pill warn">偏贵</span>`;
+      }
+      h+=`<div class="cat-card" data-act="opencat" data-id="${c.id}">
+        <div class="ic" style="background:${g.color}22">${c.ico}</div>
+        <div class="mid">
+          <div class="nm">${c.name}</div>
+          <div class="ref">参考 <b>${fmtShort(c.ref[0])}–${fmtShort(c.ref[1])}</b> · 目标 ¥${fmt(tgt)}</div>
+        </div>
+        <div class="right">
+          ${p!=null
+            ?`<div class="best good">¥${fmt(p)}</div><span class="sub-r">${q?'已选·'+esc(q.name):'最低·'+esc(mn.name)}</span>${status}`
+            :`<div class="best none">待报价</div><span class="sub-r">点开记报价</span>`}
+        </div>
+        <span class="chev">›</span>
+      </div>`;
+    });
+  });
+  $('#pg-compare').innerHTML=h;
+}
+
+/* ================= 记一笔 ================= */
+let addPrice='',addCat='';
+function refHint(c){
+  if(!c)return '';
+  if(c.id==='ruanzhuang')return '💰 这是最后预留的软装钱包：当前剩余预算会自动算进去';
+  return `参考行情：${fmtShort(c.ref[0])}–${fmtShort(c.ref[1])}（87㎡测算）`;
+}
+function renderAdd(){
+  let h=`<div class="card">
+    <h3>📋 粘贴报价 <span class="tag g-equip" style="margin-left:auto">自动识别价格</span></h3>
+    <div class="small muted" style="margin-bottom:8px">把商品标题 / 报价单 / 聊天记录里的价格文字，整段粘贴进来（微信里长按 → 拷贝，回到这里长按 → 粘贴）。</div>
+    <textarea id="pasteBox" placeholder="例如：美的中央空调一拖四5匹全直流变频 京东自营 ¥26,800 包安装"></textarea>
+    <button class="btn ghost blk" style="margin-top:10px" data-act="parse">🔍 识别价格</button>
+    <div class="chips" id="parseChips"></div>
+  </div>
+  <div class="card catpick" style="padding-bottom:18px">
+    <h3>✍️ 记入哪个品类</h3>
+    <div id="priceWrap">
+      <label class="f-lb">价格（元）</label>
+      <input class="ipt ipt-num" id="priceIpt" type="number" inputmode="decimal" placeholder="点上面识别的价，或手动输入" value="${addPrice}">
+      <div id="refHint" class="small muted" style="margin-top:6px">${addCat?refHint(catById(addCat)):''}</div>
+    </div>`;
+  GROUPS.forEach(g=>{
+    h+=`<div class="pg" style="margin-top:12px">${g.name}</div><div class="chips" style="margin-top:5px">`;
+    CATS.filter(c=>c.g===g.id).forEach(c=>{
+      h+=`<button class="chip ${addCat===c.id?'on':''}" data-act="pickcat" data-id="${c.id}">${c.ico} ${c.name}</button>`;
+    });
+    h+=`</div>`;
+  });
+  h+=`<label class="f-lb">商家 / 渠道（可选）</label>
+    <input class="ipt" id="nameIpt" placeholder="例：京东自营 / 建材城张老板 / 装修公司A">
+    <label class="f-lb">备注（可选）</label>
+    <input class="ipt" id="noteIpt" placeholder="例：含安装 / 不含辅料 / 双11价">
+    <button class="btn big blk" style="margin-top:16px" data-act="savequote">💾 保存这笔报价</button>
+    <div class="small muted" style="text-align:center;margin-top:10px">同一品类记多笔，比价页自动帮你选最低</div>
+  </div>`;
+  $('#pg-add').innerHTML=h;
+  const pi=$('#priceIpt');
+  pi.addEventListener('input',()=>{addPrice=pi.value;});
+}
+
+/* ================= 验收页 ================= */
+function renderCheck(){
+  const total=CHECK.reduce((a,g)=>a+g.items.length,0);
+  const okN=Object.values(S.check).filter(v=>v==='ok').length;
+  const badN=Object.values(S.check).filter(v=>v==='bad').length;
+  let h=`<div class="card">
+    <h3>🧪 毛坯验收（空置2年重点）<span class="tag g-hard" style="margin-left:auto">${okN}/${total} 合格</span></h3>
+    <div class="ck-sum">进场动工前，和物业/施工方把这 ${total} 项过一遍。${badN?`<b class="bad">⚠️ 有 ${badN} 项不合格，整改完再开工</b>`:'全部打勾再开工最稳。'}</div>
+    <div class="bar" style="margin-top:10px"><i style="width:${total?okN/total*100:0}%;background:var(--ok)"></i></div>
+  </div>`;
+  CHECK.forEach(sec=>{
+    h+=`<div class="card">
+      <h3>${sec.ico} ${sec.g}</h3>`;
+    sec.items.forEach((it,i)=>{
+      const key=sec.g+'|'+i,st=S.check[key]||'';
+      h+=`<div class="ck-item">
+        <div class="txt">${esc(it)}</div>
+        <div class="seg">
+          <button class="${st==='ok'?'ok':''}" data-act="ck" data-k="${esc(key)}" data-v="ok">合格</button>
+          <button class="${st==='bad'?'bad':''}" data-act="ck" data-k="${esc(key)}" data-v="bad">问题</button>
+          <button data-act="ck" data-k="${esc(key)}" data-v="">待查</button>
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+  });
+  h+=`<div class="card about"><h3>💡 为什么要先验收</h3><p>空置2年的毛坯，开发商原始水电不一定坏，但<b>不测就不知道</b>。测出来合格的部分保留，水电改造能省30–50%（约三四千）。测出问题拍照找物业免费修——这是收房权利，过期不候。</p></div>`;
+  $('#pg-check').innerHTML=h;
+}
+
+/* ================= 更多页 ================= */
+function renderMore(){
+  $('#pg-more').innerHTML=`
+  <div class="card">
+    <h3>📤 分享给朋友</h3>
+    <div class="small muted" style="margin-bottom:6px">把已记录的报价汇总成一段文字，微信直接发给湘潭的朋友看。</div>
+    <button class="btn blk" data-act="share">生成汇总文本</button>
+  </div>
+  <div class="card">
+    <h3>💾 备份与恢复</h3>
+    <div class="small muted" style="margin-bottom:6px">数据只存在这台手机的浏览器里。换手机 / 怕误删，导出一个备份文件即可。</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn ghost" style="flex:1" data-act="export">导出备份</button>
+      <button class="btn ghost" style="flex:1" data-act="import">导入备份</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>ℹ️ 关于本工具</h3>
+    <div class="about">
+      <p>· 参考价为 <b>2026年10月</b>市场行情（京东/品牌官网/装修平台公开数据），按87㎡三房测算，湘潭三四线城市人工</p>
+      <p>· 为什么不是自动爬虫：淘宝/京东等网站有跨域和反爬限制，静态网页拿不到它们的实时价。所以做成「<b>粘贴即识别＋行情参考</b>」——你看到的任何价，复制粘贴进来，比爬虫更准也更省事。</p>
+      <p>· 所有数据只保存在你手机浏览器（localStorage），不上传任何服务器。</p>
+    </div>
+  </div>
+  <div class="card">
+    <button class="row-btn" style="color:var(--bad)" data-act="wipe">
+      <div class="ic" style="background:var(--bad-bg)">🗑️</div>
+      <div class="t"><b style="color:var(--bad)">清空全部数据</b><span>报价、验收记录全没了，慎重</span></div>
+      <span class="arr">›</span>
+    </button>
+  </div>
+  <div class="small muted" style="text-align:center;padding:6px 0 14px">装修比价侠 v1.0 · 祝开工顺利 🏠</div>`;
+}
+
+/* ================= sheet ================= */
+function openSheet(html){
+  $('#sheet').innerHTML='<div class="grab"></div>'+html;
+  $('#mask').classList.add('on');$('#sheet').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  $('#mask').classList.remove('on');$('#sheet').classList.remove('on');
+  document.body.style.overflow='';
+}
+$('#mask').addEventListener('click',closeSheet);
+
+function refAdvice(c){
+  const map={
+    kongtiao:'考虑「客厅风管机+卧室挂机」混搭可省1万+',
+    dinuan:'电地暖比水暖省0.5–1万；壁挂炉可兼生活热水',
+    dingzhigui:'减少抽屉/见光板，或改部分成品柜',
+    cizhuan:'广东二线品牌砖+辅料全包谈一口价',
+    ruanzhuang:'硬装定完再买，蹲大促',
+  };
+  return map[c.id]||'可以多比两家，或降低一档品牌';
+}
+
+function openCat(id){
+  const c=catById(id),g=grpById(c.g);
+  const qs=quotesOf(id),pk=pickedQuote(id);
+  const d0=c.ref[0]*0.6,d1=c.ref[1]*1.4;
+  const pos=v=>Math.max(0,Math.min(100,(v-d0)/(d1-d0)*100));
+  const tgt=target(c);
+  const price=priceOf(id);
+  const sumInfo=price!=null?(price>tgt?`<div class="warn-line">⚠️ 当前价超目标 ¥${fmt(price-tgt)}，${refAdvice(c)}</div>`:`<div class="ok-line">✓ 当前价在目标内，比目标省 ¥${fmt(tgt-price)}</div>`):'';
+  let dots='';
+  qs.forEach(q=>{
+    const p=Math.max(3,Math.min(97,pos(q.price)));
+    dots+=`<div class="q-dot ${q.id===S.picked[id]?'pick':''}" style="left:${p}%"></div>`;
+  });
+  openSheet(`
+    <div class="sh-head">
+      <div class="ic" style="background:${g.color}">${c.ico}</div>
+      <div class="t"><b>${c.name}</b><span class="small muted">${g.name} · 目标预算 ¥${fmt(tgt)}</span></div>
+      <button class="sh-close" data-act="closesheet">✕</button>
+    </div>
+    <div class="refbox">
+      <div class="small" style="font-weight:700;margin-bottom:2px">市场参考（2026·87㎡）</div>
+      <div class="refscale">
+        <span class="lb" style="left:${pos(c.ref[0])}%">${fmtShort(c.ref[0])}</span>
+        <div class="track"></div>
+        <div class="fill" style="left:${pos(c.ref[0])}%;width:${pos(c.ref[1])-pos(c.ref[0])}%"></div>
+        <div class="mid-tick" style="left:${pos(tgt)}%"></div>
+        <div class="lb b" style="left:${pos(tgt)}%">目标 ${fmtShort(tgt)}</div>
+        ${dots}
+        <span class="lb" style="left:${pos(c.ref[1])}%">${fmtShort(c.ref[1])}</span>
+      </div>
+      <div class="ref-legend"><span>低</span><span>高</span></div>
+      ${qs.length?`<div class="small muted" style="text-align:center">🟠 = 你记录的报价（绿框=已选用）</div>`:''}
+    </div>
+    ${sumInfo}
+    <div class="small" style="font-weight:800;margin:12px 0 6px">${qs.length?`已记 ${qs.length} 笔报价：`:'还没有报价，先记一笔：'}</div>
+    ${qs.map(q=>`
+      <div class="q-row ${q.id===S.picked[id]?'pick':''}">
+        <div class="mid">
+          <div class="nm">${esc(q.name)}</div>
+          ${q.note?`<div class="nt">${esc(q.note)}</div>`:''}
+          <div class="nt">${new Date(q.ts).toLocaleDateString('zh-CN')}</div>
+        </div>
+        <div class="pr">¥${fmt(q.price)}</div>
+        <div class="ops">
+          <button class="q-act ${q.id===S.picked[id]?'use':''}" data-act="use" data-id="${q.id}">${q.id===S.picked[id]?'✓ 采用中':'采用'}</button>
+          <button class="q-act del" data-act="delq" data-id="${q.id}">删除</button>
+        </div>
+      </div>`).join('')}
+    <div class="card" style="margin-top:12px;padding:13px">
+      <label class="f-lb" style="margin-top:0">➕ 再记一笔「${c.name}」</label>
+      <div style="display:flex;gap:8px">
+        <input class="ipt ipt-num" id="shPrice" type="number" inputmode="decimal" placeholder="价格（元）" style="flex:1">
+        <button class="btn" data-act="shquick" data-id="${c.id}">保存</button>
+      </div>
+      <input class="ipt" id="shName" placeholder="商家/渠道，例：京东自营" style="margin-top:8px;font-size:14px">
+    </div>
+    <div class="tipbox"><b>💡 行家提示</b>${esc(c.tip)}</div>
+  `);
+}
+
+/* ================= 分享文本 ================= */
+function shareText(){
+  const L=[];
+  L.push('🏠 装修比价汇总（87㎡·湘潭）');
+  L.push(`总预算：¥${fmt(S.budget)}`);
+  GROUPS.forEach(g=>{
+    L.push('');
+    L.push(`【${g.name}】目标 ¥${fmt(sumTarget(g.id))}`);
+    CATS.filter(c=>c.g===g.id).forEach(c=>{
+      const q=pickedQuote(c.id),mn=minQuote(c.id);
+      const s=`${c.ico} ${c.name}｜`;
+      if(q)L.push(s+`已选 ${q.name} ¥${fmt(q.price)}`);
+      else if(mn)L.push(s+`最低 ¥${fmt(mn.price)}（${mn.name}）`);
+      else L.push(s+`未录（目标 ¥${fmt(target(c))}）`);
+    });
+  });
+  const mins=sumMin(),pk=sumPicked();
+  L.push('');
+  L.push(`已定合计 ¥${fmt(pk)} · 按最低估 ¥${fmt(mins)} · ${mins<=S.budget?'剩余':'超支'} ¥${fmt(Math.abs(S.budget-mins))}`);
+  L.push('—— 由「装修比价侠」整理');
+  return L.join('\n');
+}
+
+/* ================= 事件 ================= */
+document.body.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act],[data-tab]');
+  if(!el)return;
+  if(el.dataset.tab){switchTab(el.dataset.tab);return;}
+  const act=el.dataset.act,id=el.dataset.id;
+  if(act==='goadd'){switchTab('add');return;}
+  if(act==='opencat'){openCat(id);return;}
+  if(act==='closesheet'){closeSheet();return;}
+  if(act==='parse'){
+    const t=$('#pasteBox').value.trim();
+    if(!t){toast('先粘贴点文字进来～');return;}
+    const found=extractPrices(t);
+    if(!found.length){toast('没识别到价格，检查一下文字或手动输入');return;}
+    addPrice=String(found[0].val);
+    $('#parseChips').innerHTML=found.map((f,i)=>
+      `<button class="chip ${i===0?'on':''}" data-act="usechip" data-v="${f.val}">¥${fmt(f.val)}<span class="c-tag">${f.conf==='hi'?'识别':'疑似'}</span></button>`
+    ).join('');
+    const pi=$('#priceIpt');pi.value=addPrice;
+    toast(`识别到 ${found.length} 个价格，点选一个`);
+    return;
+  }
+  if(act==='usechip'){
+    document.querySelectorAll('#parseChips .chip').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');addPrice=el.dataset.v;
+    $('#priceIpt').value=el.dataset.v;$('#priceIpt').focus();
+    return;
+  }
+  if(act==='pickcat'){
+    addCat=id;
+    document.querySelectorAll('.catpick .chip').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');
+    $('#refHint').textContent=refHint(catById(id));
+    return;
+  }
+  if(act==='savequote'){
+    const price=parseFloat($('#priceIpt').value);
+    if(!addCat){toast('先选一个品类');return;}
+    if(isNaN(price)||price<=0){toast('价格没填或不对');return;}
+    const name=$('#nameIpt').value.trim()||('报价 '+new Date().toLocaleDateString('zh-CN'));
+    const note=$('#noteIpt').value.trim();
+    if(!S.quotes[addCat])S.quotes[addCat]=[];
+    S.quotes[addCat].push({id:uid(),name,price,note,ts:Date.now()});
+    save();
+    const c=catById(addCat);
+    toast(`已记入「${c.name}」`);
+    $('#nameIpt').value='';$('#noteIpt').value='';$('#priceIpt').value='';$('#pasteBox').value='';
+    $('#parseChips').innerHTML='';addPrice='';
+    renderCompare();updateHeader();
+    return;
+  }
+  if(act==='shquick'){
+    const c=catById(id);
+    const price=parseFloat($('#shPrice').value);
+    if(isNaN(price)||price<=0){toast('先填价格');return;}
+    const name=$('#shName').value.trim()||('报价 '+new Date().toLocaleDateString('zh-CN'));
+    if(!S.quotes[id])S.quotes[id]=[];
+    S.quotes[id].push({id:uid(),name,price,note:'',ts:Date.now()});
+    save();openCat(id);renderPage(curTab);
+    toast('已记一笔');
+    return;
+  }
+  if(act==='use'){
+    const catOpen=$('#sheet [data-act="shquick"]');
+    const cid=catOpen?catOpen.dataset.id:null;
+    if(cid){S.picked[cid]=id;save();openCat(cid);renderPage(curTab);}
+    return;
+  }
+  if(act==='delq'){
+    const catOpen=$('#sheet [data-act="shquick"]');
+    const cid=catOpen?catOpen.dataset.id:null;
+    if(cid){
+      if(S.picked[cid]===id)delete S.picked[cid];
+      S.quotes[cid]=S.quotes[cid].filter(q=>q.id!==id);
+      save();openCat(cid);renderPage(curTab);toast('已删除');
+    }
+    return;
+  }
+  if(act==='ck'){
+    const k=el.dataset.k,v=el.dataset.v;
+    if(v)S.check[k]=v;else delete S.check[k];
+    save();renderCheck();return;
+  }
+  if(act==='share'){
+    const txt=shareText();
+    openSheet(`
+      <div class="sh-head">
+        <div class="ic" style="background:var(--brand)">📤</div>
+        <div class="t"><b>汇总文本</b><span class="small muted">复制后发微信给朋友</span></div>
+        <button class="sh-close" data-act="closesheet">✕</button>
+      </div>
+      <textarea id="shareTxt" readonly>${esc(txt)}</textarea>
+      <button class="btn big blk" style="margin-top:12px" data-act="copytxt">复制全文</button>
+    `);
+    return;
+  }
+  if(act==='copytxt'){
+    const ta=$('#shareTxt');
+    const done=()=>toast('已复制，去微信粘贴吧');
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(ta.value).then(done).catch(()=>{ta.select();document.execCommand('copy');done();});
+    }else{ta.select();ta.setSelectionRange(0,999999);document.execCommand('copy');done();}
+    return;
+  }
+  if(act==='export'){
+    const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='装修比价侠备份-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();a.remove();
+    toast('备份文件已生成');
+    return;
+  }
+  if(act==='import'){
+    $('#fileImp').click();return;
+  }
+  if(act==='wipe'){
+    if(!confirm('确定清空全部报价和验收记录？这个操作不可恢复'))return;
+    if(!confirm('再确认一次：真的全清空？建议先导出备份'))return;
+    S=defaultS();save();renderPage(curTab);toast('已清空');
+    return;
+  }
+});
+
+document.addEventListener('change',e=>{
+  if(e.target.id==='fileImp'){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const p=JSON.parse(r.result);
+        if(typeof p.budget!=='number'||typeof p.quotes!=='object')throw 0;
+        S=Object.assign(defaultS(),p);save();renderPage(curTab);toast('备份已恢复');
+      }catch(err){toast('文件格式不对，恢复失败');}
+    };
+    r.readAsText(f);
+  }
+});
+
+/* ================= 启动 ================= */
+renderTabbar();
+switchTab('budget');
+</script>
+</body>
+</html>
